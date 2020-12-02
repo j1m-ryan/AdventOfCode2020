@@ -19,7 +19,7 @@ file
     let pos2 = bounds[1];
     let password = splitLine[1].trim();
 
-    if ((password[pos1 - 1] == letter) ^ (password[pos2 - 1] == letter)) {
+    if ((password[pos1 - 1] === letter) ^ (password[pos2 - 1] === letter)) {
       numValidPasswords++;
     }
   })
