@@ -6,43 +6,41 @@ const file = readline.createInterface({
   output: process.stdout,
   terminal: false,
 });
-let maxSeat = 0;
-let list = [];
-const calcSeatNum = (str) => {
-  let rowInfo = str.substring(0, 7);
-  let colInfo = str.substring(7);
-  let rowsHigh = 127;
-  let rowsLow = 0;
-  let colsHigh = 7;
-  let colsLow = 0;
-  for (let c of rowInfo) {
-    if (c == "F") {
-      rowsHigh = Math.floor(rowsHigh - (rowsHigh - rowsLow) / 2);
-    } else {
-      rowsLow = Math.ceil(rowsLow + (rowsHigh - rowsLow) / 2);
-    }
-  }
-  for (let c of colInfo) {
-    if (c == "L") {
-      colsHigh = Math.floor(colsHigh - (colsHigh - colsLow) / 2);
-    } else {
-      colsLow = Math.ceil(colsLow + (colsHigh - colsLow) / 2);
-    }
-  }
-  return Math.min(rowsHigh, rowsLow) * 8 + Math.max(colsHigh, colsLow);
-};
-
+let everyOneAnswered = 0;
+let currentGroup = {};
+let currentGroupSize = 0;
 file
   .on("line", (line) => {
-    list.push(Math.max(maxSeat, calcSeatNum(line)));
+    if (line.length != 0) {
+      for (let c of line) {
+        if (Object.prototype.hasOwnProperty.call(currentGroup, c)) {
+          currentGroup[c]++;
+        } else {
+          currentGroup[c] = 1;
+        }
+      }
+      currentGroupSize++;
+    } else {
+      for (let prop in currentGroup) {
+        if (Object.prototype.hasOwnProperty.call(currentGroup, prop)) {
+          if (currentGroup[prop] == currentGroupSize) {
+            everyOneAnswered++;
+          }
+        }
+      }
+      currentGroup = {};
+      currentGroupSize = 0;
+    }
   })
   .on("close", () => {
-    list.sort((a, b) => a - b);
-    let prev = list[0];
-    for (let i of list) {
-      if (i - prev > 1) {
-        console.log(prev + 1);
+    for (let prop in currentGroup) {
+      if (Object.prototype.hasOwnProperty.call(currentGroup, prop)) {
+        if (currentGroup[prop] == currentGroupSize) {
+          everyOneAnswered++;
+        }
       }
-      prev = i;
     }
+    console.log(
+      `For each group, the sum of Q's that everyone answered is :${everyOneAnswered} `
+    );
   });
